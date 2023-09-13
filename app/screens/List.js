@@ -68,7 +68,6 @@ const List = ({ navigation }) => {
                 />
             </View>
             )}
-            {/* <Button onPress={() => navigation.navigate('Details')} title="Open Details" /> */}
         </View>
     )
 };
