@@ -1,5 +1,5 @@
 import {View, Text, Button, StyleSheet, TextInput, FlatList} from 'react-native';
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FIRESTORE_DB } from '../../firebaseConfig';
 import {doc, deleteDoc, onSnapshot, addDoc, collection, updateDoc } from 'firebase/firestore'; 
 import { Entypo, AntDesign } from '@expo/vector-icons'; 
