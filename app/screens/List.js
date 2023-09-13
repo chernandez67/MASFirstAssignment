@@ -1,13 +1,13 @@
 import {View, Text, Button, StyleSheet, TextInput, FlatList} from 'react-native';
 import React, { useEffect, useState, useCallback } from 'react';
 import { FIRESTORE_DB } from '../../firebaseConfig';
-import {doc, deleteDoc, onSnapshot, addDoc, collection } from 'firebase/firestore'; 
-import { Entypo } from '@expo/vector-icons'; 
+import {doc, deleteDoc, onSnapshot, addDoc, collection, updateDoc } from 'firebase/firestore'; 
+import { Entypo, AntDesign } from '@expo/vector-icons'; 
 
 const List = ({ navigation }) => {
     const [todos, setTodos] = useState([]);
     const [todo, setTodo] = useState('');
-    const todoCollectionRef = collection(FIRESTORE_DB, 'todos');
+    const todoCollectionRef = collection(FIRESTORE_DB, 'items');
 
     useEffect(() => {
         const subscriber = onSnapshot(todoCollectionRef, {
@@ -27,21 +27,28 @@ const List = ({ navigation }) => {
     }, []);
 
     const addTodo = async() => {
-        const doc = await addDoc(todoCollectionRef, {title: todo, done: false});
+        const doc = await addDoc(todoCollectionRef, {title: todo, quantity: 1});
         setTodo('');
     }
 
-    const deleteTodo = async(id) => {
-        const todoDoc = doc(FIRESTORE_DB, "todos", id);
-        deleteDoc(todoDoc);
+    const deleteItem = async(id) => {
+        const itemDoc = doc(FIRESTORE_DB, "items", id);
+        deleteDoc(itemDoc);
+    }
+
+    const changeQuantity = async(id, newQuantity) => {
+        const itemDoc = doc(FIRESTORE_DB, "items", id);
+        updateDoc(itemDoc, {quantity: newQuantity});
     }
 
     const renderTodo = ({item}) => {
 
         return (
             <View style={styles.todoContainer}>
-                <Text  style={styles.todoText}>{item.title} </Text>
-                <Entypo name="trash" size={24} color="black" onPress={() => deleteTodo(item.id)} />
+                <Text  style={styles.todoText}>{item.title}: {item.quantity}</Text>
+                <AntDesign name="plus" size={24} color="black" onPress={() => changeQuantity(item.id, item.quantity + 1)}/>
+                <AntDesign name="minus" size={24} color="black" onPress={() => changeQuantity(item.id, Math.max(1, item.quantity - 1))}/>
+                <Entypo name="trash" size={24} color="black" onPress={() => deleteItem(item.id)} />
             </View>
         )
     };
@@ -49,8 +56,8 @@ const List = ({ navigation }) => {
     return (
         <View style={styles.container}>
             <View style={styles.form}>
-                <TextInput style={styles.input} placeholder = "Add new todo" onChangeText={(text) => setTodo(text)} value={todo} />
-                <Button onPress={() => addTodo()} title="Add Todo" disabled={todo === ''}/>
+                <TextInput style={styles.input} placeholder = "Add new item" onChangeText={(text) => setTodo(text)} value={todo} />
+                <Button onPress={() => addTodo()} title="Add Item" disabled={todo === ''}/>
             </View>
             { todos.length > 0 && (
             <View>
